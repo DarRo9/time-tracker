@@ -1,0 +1,327 @@
+openapi: 3.0.3
+info:
+  title: Time Tracker API
+  version: 1.0.0
+paths:
+  /api/users/{userID}/tasks:
+    get:
+      summary: Get user tasks by period
+      description: Get tasks for a user within a specified time period
+      tags:
+        - tasks
+      parameters:
+        - name: userID
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: start
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date-time
+        - name: end
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date-time
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Task'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                type: object
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                type: object
+  /api/tasks/start:
+    post:
+      summary: Start a new task
+      description: Start tracking time for a new task
+      tags:
+        - tasks
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Request'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Task'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                type: object
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                type: object
+  /api/tasks/end/{taskID}:
+    post:
+      summary: End a task
+      description: End tracking time for a task
+      tags:
+        - tasks
+      parameters:
+        - name: taskID
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Task'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                type: object
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                type: object
+  /api/users:
+    get:
+      summary: Получить всех пользователей
+      description: Возвращает список всех пользователей с возможностью фильтрации, пагинации и сортировки
+      tags:
+        - users
+      parameters:
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 1
+          description: Количество записей для возврата
+        - name: offset
+          in: query
+          schema:
+            type: integer
+            default: 0
+          description: Смещение записей для возврата
+        - name: passport_number
+          in: query
+          schema:
+            type: string
+          description: Номер паспорта
+        - name: surname
+          in: query
+          schema:
+            type: string
+          description: Фамилия
+        - name: name
+          in: query
+          schema:
+            type: string
+          description: Имя
+        - name: patronymic
+          in: query
+          schema:
+            type: string
+          description: Отчество
+        - name: address
+          in: query
+          schema:
+            type: string
+          description: Адрес
+      responses:
+        '200':
+          description: Успешно
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+        '400':
+          description: Неверный запрос
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: Invalid limit value
+        '500':
+          description: Внутренняя ошибка сервера
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: Internal server error
+    post:
+      summary: Добавить нового пользователя
+      description: Добавляет нового пользователя в систему
+      tags:
+        - users
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+      responses:
+        '201':
+          description: Пользователь добавлен
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  msg:
+                    type: string
+                    example: Пользователь добавлен!
+        '400':
+          description: Неверный запрос
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: Неверный запрос
+        '500':
+          description: Внутренняя ошибка сервера
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: Internal server error
+  /api/users/{userID}:
+    put:
+      summary: Update user
+      description: Update user information
+      tags:
+        - users
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                type: object
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                type: object
+    delete:
+      summary: Delete user
+      description: Delete a user by ID
+      tags:
+        - users
+      parameters:
+        - name: userID
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                type: object
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                type: object
+components:
+  schemas:
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        surname:
+          type: string
+        patronymic:
+          type: string
+        address:
+          type: string
+        passport_number:
+          type: string
+    Task:
+      type: object
+      properties:
+        id:
+          type: integer
+        userID:
+          type: integer
+        description:
+          type: string
+        startTime:
+          type: string
+          format: date-time
+        endTime:
+          type: string
+          format: date-time
+    Request:
+      type: object
+      properties:
+        userID:
+          type: integer
+        description:
+          type: string
