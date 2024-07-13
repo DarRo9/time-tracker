@@ -1,0 +1,71 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:13
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password123
+      POSTGRES_DB: time_tracker
+    ports:
+      - "5432:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    command: ["postgres", "-c", "log_statement=all"] 
+
+  migrate:
+    image: migrate/migrate:v4.14.1
+    volumes:
+      - ./migrations:/migrations
+    entrypoint: [
+      "sh", "-c",
+      "until nc -z db 5432; do sleep 2; done; migrate -path=/migrations -database postgres://postgres:password123@db:5432/time_tracker?sslmode=disable up"
+    ]
+    depends_on:
+      - db
+
+  rollback:
+    image: migrate/migrate:v4.14.1
+    volumes:
+      - ./migrations:/migrations
+    entrypoint: [
+      "sh", "-c",
+      "until nc -z db 5432; do sleep 2; done; migrate -path=/migrations -database postgres://postgres:password123@db:5432/time_tracker?sslmode=disable down"
+    ]
+    depends_on:
+      - db
+
+  app:
+    build: .
+    ports:
+      - "8080:8080"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password123
+      POSTGRES_HOST: db
+      POSTGRES_PORT: 5432
+      POSTGRES_NAME: time_tracker
+    depends_on:
+      - db
+      - migrate
+      - rollback
+    volumes:
+      - ./internal/logger:/var/log/myapp
+    command: ["./wait-for-db.sh", "migrate", "app"]  
+
+  seed:
+    build: ./seeds
+    depends_on:
+      - db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password123
+      POSTGRES_HOST: db
+      POSTGRES_PORT: 5432
+      POSTGRES_NAME: time_tracker
+    volumes:
+      - ./seeds:/seeds
+    command: ["./seed.sh"]
+
+volumes:
+  db_data:
