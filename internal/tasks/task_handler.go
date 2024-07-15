@@ -6,8 +6,8 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/DarRo9/time-tracker/internal/apperrors"
-	"github.com/DarRo9/time-tracker/internal/responses"
+	"time-tracker/internal/apperrors"
+	"time-tracker/internal/responses"
 
 	"github.com/gin-gonic/gin"
 )

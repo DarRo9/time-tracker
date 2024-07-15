@@ -18,7 +18,7 @@ func init() {
 	if err == nil {
 		Logger.SetOutput(file)
 	} else {
-		Logger.Info("Не удалось открыть файл логов")
+		Logger.Info("Failed to open log file")
 	}
-	Logger.Debug("Функция init() выполнена")
+	Logger.Debug("init() function completed")
 }

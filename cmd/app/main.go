@@ -1,11 +1,12 @@
 package main
 
 import (
-	_ "github.com/DarRo9/time-tracker/cmd/app/docs"
-	"github.com/DarRo9/time-tracker/internal/controllers"
-	db "github.com/DarRo9/time-tracker/internal/database"
+	_ "time-tracker/cmd/app/docs"
+	"time-tracker/internal/controllers"
+	db "time-tracker/internal/database"
 
 	"github.com/gin-gonic/gin"
+	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
 )
 

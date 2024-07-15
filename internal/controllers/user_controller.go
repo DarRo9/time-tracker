@@ -4,9 +4,9 @@ import (
 	"net/http"
 	"strconv"
 
-	db "github.com/DarRo9/time-tracker/internal/database"
-	"github.com/DarRo9/time-tracker/internal/logger"
-	"github.com/DarRo9/time-tracker/internal/models"
+	db "time-tracker/internal/database"
+	"time-tracker/internal/logger"
+	"time-tracker/internal/models"
 
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
@@ -30,7 +30,7 @@ func (uc *UserController) GetUsers(c *gin.Context) {
 			logger.Logger.WithFields(logrus.Fields{
 				"limit": limitStr,
 				"error": err,
-			}).Error("Неверное значение указанного лимита")
+			}).Error("Invalid value of the specified limit")
 			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid limit value"})
 			return
 		}
@@ -43,7 +43,7 @@ func (uc *UserController) GetUsers(c *gin.Context) {
 			logger.Logger.WithFields(logrus.Fields{
 				"offset": offsetStr,
 				"error":  err,
-			}).Error("Указано неверное значение отступа ")
+			}).Error("Invalid indent value specified")
 			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid offset value"})
 			return
 		}
@@ -66,7 +66,7 @@ func (uc *UserController) GetUsers(c *gin.Context) {
 			"limit":  limit,
 			"offset": offset,
 			"error":  err,
-		}).Error("Не удалось получить информацию о пользователях")
+		}).Error("Failed to get user information")
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
@@ -79,8 +79,8 @@ func (uc *UserController) AddUser(c *gin.Context) {
 	if err := c.BindJSON(&user); err != nil {
 		logger.Logger.WithFields(logrus.Fields{
 			"error": err,
-		}).Error("Не удалось забиндить модель с данными")
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Неверный запрос"})
+		}).Error("Failed to bind model to data")
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Failed to bind model to data"})
 		return
 	}
 
@@ -88,16 +88,16 @@ func (uc *UserController) AddUser(c *gin.Context) {
 		logger.Logger.WithFields(logrus.Fields{
 			"user":  user,
 			"error": err,
-		}).Error("Произошла ошибка при попытке создать пользователя")
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "упс, не получилось создать пользователя"})
+		}).Error("An error occurred while trying to create a user")
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "An error occurred while trying to create a user"})
 		return
 	}
 
 	logger.Logger.WithFields(logrus.Fields{
 		"user": user,
-	}).Info("Ура, пользователь был создан и добавлен!")
+	}).Info("the user has been created and added!")
 
-	c.JSON(http.StatusCreated, gin.H{"msg": "Пользователь добавлен!"})
+	c.JSON(http.StatusCreated, gin.H{"msg": "the user has been created and added!"})
 }
 
 func (uc *UserController) UpdateUser(c *gin.Context) {
@@ -105,8 +105,8 @@ func (uc *UserController) UpdateUser(c *gin.Context) {
 	if err := c.BindJSON(&user); err != nil {
 		logger.Logger.WithFields(logrus.Fields{
 			"error": err,
-		}).Error("Не удалось забиндить модель с данными")
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Неверный запрос"})
+		}).Error("Failed to bind model to data")
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Failed to bind model to data"})
 		return
 	}
 
@@ -114,15 +114,15 @@ func (uc *UserController) UpdateUser(c *gin.Context) {
 		logger.Logger.WithFields(logrus.Fields{
 			"user":  user,
 			"error": err,
-		}).Error("Произошла ошибка при попытке обновить информацию об пользователе")
+		}).Error("An error occurred while trying to update user information")
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
 	logger.Logger.WithFields(logrus.Fields{
 		"user": user,
-	}).Info("Информация об пользователе была успешно обновлена")
-	c.JSON(http.StatusOK, gin.H{"msg": "Информация пользователя была успешно изменена!"})
+	}).Info("User information has been successfully updated")
+	c.JSON(http.StatusOK, gin.H{"msg": "User information has been successfully updated"})
 }
 
 func (uc *UserController) DeleteUser(c *gin.Context) {
@@ -131,21 +131,21 @@ func (uc *UserController) DeleteUser(c *gin.Context) {
 		logger.Logger.WithFields(logrus.Fields{
 			"userID": c.Param("userID"),
 			"error":  err,
-		}).Error("Неверный юзер-айди")
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Неверная айдишка пользователя"})
+		}).Error("Invalid user ID")
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid user ID"})
 		return
 	}
 	if err := uc.userRepo.DeleteUser(c, userID); err != nil {
 		logger.Logger.WithFields(logrus.Fields{
 			"userID": c.Param("userID"),
 			"error":  err,
-		}).Error("Не получилось удалить юзера")
+		}).Error("Failed to delete user")
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 	logger.Logger.WithFields(logrus.Fields{
 		"userID": c.Param("userID"),
 		"error":  err,
-	}).Info("Юзер был удален")
-	c.JSON(http.StatusOK, gin.H{"msg": "Пользователь был успешно удален"})
+	}).Info("The user has been deleted")
+	c.JSON(http.StatusOK, gin.H{"msg": "The user has been deleted"})
 }

@@ -11,7 +11,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/DarRo9/time-tracker/internal/apperrors"
+	"time-tracker/internal/apperrors"
 )
 
 const infoURL = "http://localhost:8081/info"
