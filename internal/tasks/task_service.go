@@ -6,7 +6,7 @@ import (
 	"sort"
 	"time"
 
-	"github.com/DarRo9/time-tracker/internal/apperrors"
+	"time-tracker/internal/apperrors"
 )
 
 type service struct {

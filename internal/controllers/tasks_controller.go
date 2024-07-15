@@ -5,9 +5,9 @@ import (
 	"strconv"
 	"time"
 
-	db "github.com/DarRo9/time-tracker/internal/database"
-	"github.com/DarRo9/time-tracker/internal/logger"
-	"github.com/DarRo9/time-tracker/internal/models"
+	db "time-tracker/internal/database"
+	"time-tracker/internal/logger"
+	"time-tracker/internal/models"
 
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
@@ -40,8 +40,8 @@ func (tc *TaskController) GetUserTasksByPeriod(c *gin.Context) {
 		logger.Logger.WithFields(logrus.Fields{
 			"userID": c.Param("userID"),
 			"error":  err,
-		}).Error("Юзер айди неверное")
-		c.JSON(http.StatusBadRequest, gin.H{"error": "айди юзера неверное"})
+		}).Error("User ID is incorrect")
+		c.JSON(http.StatusBadRequest, gin.H{"error": "User ID is incorrect"})
 		return
 	}
 
@@ -50,7 +50,7 @@ func (tc *TaskController) GetUserTasksByPeriod(c *gin.Context) {
 		logger.Logger.WithFields(logrus.Fields{
 			"start": c.Query("start"),
 			"error": err,
-		}).Error("Неправильное время старта")
+		}).Error("Invalid start time")
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid start time"})
 		return
 	}
@@ -60,7 +60,7 @@ func (tc *TaskController) GetUserTasksByPeriod(c *gin.Context) {
 		logger.Logger.WithFields(logrus.Fields{
 			"end":   c.Query("end"),
 			"error": err,
-		}).Error("Неправильное время окончания")
+		}).Error("Invalid end time")
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid end time"})
 		return
 	}
@@ -72,7 +72,7 @@ func (tc *TaskController) GetUserTasksByPeriod(c *gin.Context) {
 			"start":  start,
 			"end":    end,
 			"error":  err,
-		}).Error("Не удалось получить таски пользователя за период")
+		}).Error("Failed to get user tasks for the period")
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
@@ -80,7 +80,7 @@ func (tc *TaskController) GetUserTasksByPeriod(c *gin.Context) {
 		"userID": c.Param("userID"),
 		"start":  start,
 		"end":    end,
-	}).Info("Успешное получение тасок пользователя за период")
+	}).Info("Successfully receiving user tasks for the period")
 
 	c.JSON(http.StatusOK, tasks)
 }
@@ -101,8 +101,8 @@ func (tc *TaskController) StartTask(c *gin.Context) {
 	if err := c.BindJSON(&req); err != nil {
 		logger.Logger.WithFields(logrus.Fields{
 			"error": err,
-		}).Error("Не удалось забиндить модель с данными")
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Неверный запрос"})
+		}).Error("Failed to bind model to data")
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Failed to bind model to data"})
 		return
 	}
 
@@ -111,7 +111,7 @@ func (tc *TaskController) StartTask(c *gin.Context) {
 			"userID":      int(req.UserID),
 			"description": req.Description,
 			"error":       err,
-		}).Error("Не удалось начать таску")
+		}).Error("Failed to start task")
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
@@ -119,8 +119,8 @@ func (tc *TaskController) StartTask(c *gin.Context) {
 	logger.Logger.WithFields(logrus.Fields{
 		"userID":      int(req.UserID),
 		"description": req.Description,
-	}).Info("Задача была начата")
-	c.JSON(http.StatusCreated, gin.H{"msg": "Задача взята, тайм-треккинг начат"})
+	}).Info("The task has been started")
+	c.JSON(http.StatusCreated, gin.H{"msg": "The task has been started"})
 }
 
 // @Summary     End a task
@@ -139,8 +139,8 @@ func (tc *TaskController) EndTask(c *gin.Context) {
 		logger.Logger.WithFields(logrus.Fields{
 			"taskID": taskID,
 			"error":  err,
-		}).Error("Неверная айди таски")
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Неверная айдишка начатой задачи"})
+		}).Error("Invalid task ID")
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid task ID"})
 		return
 	}
 
@@ -148,13 +148,13 @@ func (tc *TaskController) EndTask(c *gin.Context) {
 		logger.Logger.WithFields(logrus.Fields{
 			"taskID": taskID,
 			"error":  err,
-		}).Error("Не удалось окончить таску")
+		}).Error("Failed to finish task")
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 	logger.Logger.WithFields(logrus.Fields{
 		"taskID": taskID,
-	}).Info("Таска была окончена")
+	}).Info("The task was over")
 
-	c.JSON(http.StatusOK, gin.H{"msg": "Выполнение задачи окончено, тайм-треккинг остановлен"})
+	c.JSON(http.StatusOK, gin.H{"msg": "The task was over"})
 }

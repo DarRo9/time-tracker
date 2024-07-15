@@ -4,8 +4,8 @@ import (
 	"context"
 	"time"
 
-	"github.com/DarRo9/time-tracker/internal/logger"
-	"github.com/DarRo9/time-tracker/internal/models"
+	"time-tracker/internal/logger"
+	"time-tracker/internal/models"
 
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/sirupsen/logrus"
@@ -24,7 +24,7 @@ func (r *TaskRepository) GetUserTasksByPeriod(ctx context.Context, userID int, s
 		"userID": userID,
 		"start":  start,
 		"end":    end,
-	}).Debug("Запрос тасок пользователя за период")
+	}).Debug("Request for user tasks for a period")
 
 	var tasks []models.Task
 	query := `
@@ -37,7 +37,7 @@ func (r *TaskRepository) GetUserTasksByPeriod(ctx context.Context, userID int, s
 	if err != nil {
 		logger.Logger.WithFields(logrus.Fields{
 			"error": err,
-		}).Error("Произошла ошибка при выполнении запроса получения тасок")
+		}).Error("An error occurred while executing a request to receive tasks")
 		return nil, err
 	}
 	defer rows.Close()
@@ -47,7 +47,7 @@ func (r *TaskRepository) GetUserTasksByPeriod(ctx context.Context, userID int, s
 		if err := rows.Scan(&task.ID, &task.UserID, &task.Description, &task.StartTime, &task.EndTime, &task.CreatedAt, &task.UpdatedAt); err != nil {
 			logger.Logger.WithFields(logrus.Fields{
 				"error": err,
-			}).Error("Произошла ошибка при сканировании строки тасок")
+			}).Error("An error occurred while scanning the task line")
 			return nil, err
 		}
 		tasks = append(tasks, task)
@@ -55,7 +55,7 @@ func (r *TaskRepository) GetUserTasksByPeriod(ctx context.Context, userID int, s
 	if rows.Err() != nil {
 		logger.Logger.WithFields(logrus.Fields{
 			"error": err,
-		}).Error("Произошла ошибка при итерации по строкам данных")
+		}).Error("An error occurred while iterating through the data rows")
 		return nil, rows.Err()
 	}
 
@@ -64,7 +64,7 @@ func (r *TaskRepository) GetUserTasksByPeriod(ctx context.Context, userID int, s
 		"start":  start,
 		"end":    end,
 		"count":  len(tasks),
-	}).Info("Успешно получены таски юзера за период")
+	}).Info("Successfully received user tasks for the period")
 
 	return tasks, nil
 }
@@ -85,7 +85,7 @@ func (r *TaskRepository) StartTask(ctx context.Context, userID int, description 
 			"userID":      userID,
 			"description": description,
 			"error":       err,
-		}).Error("Произошла ошибка при попытка начать новую таску")
+		}).Error("An error occurred when trying to start a new task")
 		return err
 	}
 
@@ -100,7 +100,7 @@ func (r *TaskRepository) StartTask(ctx context.Context, userID int, description 
 func (r *TaskRepository) EndTask(ctx context.Context, taskID int) error {
 	logger.Logger.WithFields(logrus.Fields{
 		"taskID": taskID,
-	}).Debug("Окончание таски")
+	}).Debug("End of task")
 
 	query := `
 			UPDATE tasks
@@ -112,13 +112,13 @@ func (r *TaskRepository) EndTask(ctx context.Context, taskID int) error {
 		logger.Logger.WithFields(logrus.Fields{
 			"taskID": taskID,
 			"error":  err,
-		}).Error("Произошла ошибка при окончании таски")
+		}).Error("An error occurred while completing the task")
 		return err
 	}
 
 	logger.Logger.WithFields(logrus.Fields{
 		"taskID": taskID,
-	}).Info("Таска успешно завершена")
+	}).Info("Task completed successfully")
 
 	return nil
 }

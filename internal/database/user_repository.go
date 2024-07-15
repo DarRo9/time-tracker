@@ -6,8 +6,8 @@ import (
 	"context"
 	"time"
 
-	"github.com/DarRo9/time-tracker/internal/logger"
-	"github.com/DarRo9/time-tracker/internal/models"
+	"time-tracker/internal/logger"
+	"time-tracker/internal/models"
 
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/sirupsen/logrus"
@@ -38,12 +38,12 @@ func (r *UserRepository) CreateUser(ctx context.Context, user *models.User) erro
 	if err != nil {
 		logger.Logger.WithFields(logrus.Fields{
 			"error": err,
-		}).Error("Произошла ошибка при создании юзера")
+		}).Error("An error occurred while creating a user")
 	}
 
 	logger.Logger.WithFields(logrus.Fields{
 		"userID": user.ID,
-	}).Info("Юзер был создан")
+	}).Info("The user has been created")
 
 	return nil
 }
@@ -51,7 +51,7 @@ func (r *UserRepository) CreateUser(ctx context.Context, user *models.User) erro
 func (r *UserRepository) GetUserByID(ctx context.Context, id int) (*models.User, error) {
 	logger.Logger.WithFields(logrus.Fields{
 		"userID": id,
-	}).Debug("Получение юзера по айди")
+	}).Debug("Getting a user by ID")
 
 	user := &models.User{}
 	query := `SELECT id, passport_number, surname, name, patronymic, address, created_at, updated_at FROM users WHERE id=$1`
@@ -60,13 +60,13 @@ func (r *UserRepository) GetUserByID(ctx context.Context, id int) (*models.User,
 		logger.Logger.WithFields(logrus.Fields{
 			"userID": id,
 			"error":  err,
-		}).Error("Произошла ошибка при получении юзера по айди")
+		}).Error("An error occurred while retrieving the user's ID")
 		return nil, err
 	}
 
 	logger.Logger.WithFields(logrus.Fields{
 		"userID": id,
-	}).Info("Данные юзера успешно полученцы")
+	}).Info("User data successfully received")
 
 	return user, nil
 
@@ -80,7 +80,7 @@ func (r *UserRepository) UpdateUser(ctx context.Context, user *models.User) erro
 		"name":            user.Name,
 		"patronymic":      user.Patronymic,
 		"address":         user.Address,
-	}).Debug("Обновление данных юзера")
+	}).Debug("Updating user data")
 
 	user.UpdatedAt = time.Now()
 	query := `UPDATE users SET passport_number=$1, surname=$2, name=$3, patronymic=$4, address=$5, updated_at=$6 WHERE id=$7`
@@ -90,19 +90,19 @@ func (r *UserRepository) UpdateUser(ctx context.Context, user *models.User) erro
 		logger.Logger.WithFields(logrus.Fields{
 			"userID": user.ID,
 			"error":  err,
-		}).Error("Произошла ошибка при обновлении данных юзера")
+		}).Error("An error occurred while updating user data")
 		return err
 	}
 	logger.Logger.WithFields(logrus.Fields{
 		"userID": user.ID,
-	}).Info("Данные юзера были успшено обновлены")
+	}).Info("User data has been successfully updated")
 	return nil
 }
 
 func (r *UserRepository) DeleteUser(ctx context.Context, id int) error {
 	logger.Logger.WithFields(logrus.Fields{
 		"userID": id,
-	}).Debug("Удаление юзера")
+	}).Debug("Deleting a user")
 
 	query := `DELETE FROM users WHERE id=$1`
 	_, err := r.db.Exec(ctx, query, id)
@@ -110,12 +110,12 @@ func (r *UserRepository) DeleteUser(ctx context.Context, id int) error {
 		logger.Logger.WithFields(logrus.Fields{
 			"userID": id,
 			"error":  err,
-		}).Error("Произошла ошибка при удалении юзера")
+		}).Error("An error occurred when deleting a user")
 		return err
 	}
 	logger.Logger.WithFields(logrus.Fields{
 		"userID": id,
-	}).Info("Юзер был успешно удален")
+	}).Info("The user was successfully deleted")
 
 	return nil
 }
@@ -125,7 +125,7 @@ func (r *UserRepository) GetUsers(ctx context.Context, filter map[string]interfa
 		"filter": filter,
 		"limit":  limit,
 		"offset": offset,
-	}).Debug("Получение юзеров с возможностью фильтрации и пагинации")
+	}).Debug("Obtaining users with the ability to filter and paginate")
 
 	var argID int = 1
 	query := "SELECT id, passport_number, surname, name, patronymic, address, created_at, updated_at FROM users WHERE true"
@@ -143,7 +143,7 @@ func (r *UserRepository) GetUsers(ctx context.Context, filter map[string]interfa
 	if err != nil {
 		logger.Logger.WithFields(logrus.Fields{
 			"error": err,
-		}).Error("Произошла ошибка при получении юзеров")
+		}).Error("An error occurred while retrieving users")
 		return nil, err
 	}
 	defer rows.Close()
@@ -154,7 +154,7 @@ func (r *UserRepository) GetUsers(ctx context.Context, filter map[string]interfa
 		if err := rows.Scan(&user.ID, &user.PassportNumber, &user.Surname, &user.Name, &user.Patronymic, &user.Address, &user.CreatedAt, &user.UpdatedAt); err != nil {
 			logger.Logger.WithFields(logrus.Fields{
 				"error": err,
-			}).Error("Произошла ошибка при сканировании строк юзеров")
+			}).Error("An error occurred while scanning user strings")
 			return nil, err
 		}
 
@@ -163,7 +163,7 @@ func (r *UserRepository) GetUsers(ctx context.Context, filter map[string]interfa
 	if rows.Err() != nil {
 		logger.Logger.WithFields(logrus.Fields{
 			"error": rows.Err(),
-		}).Error("Произошла ошибка при попытке иттерации по строкам с юзерами")
+		}).Error("An error occurred when trying to iterate over rows with users")
 		return nil, rows.Err()
 	}
 
@@ -172,7 +172,7 @@ func (r *UserRepository) GetUsers(ctx context.Context, filter map[string]interfa
 		"limit":  limit,
 		"offset": offset,
 		"count":  len(users),
-	}).Info("Информация об пользователях успешно получена")
+	}).Info("User information successfully received")
 
 	return users, nil
 }
